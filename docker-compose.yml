@@ -1,14 +1,74 @@
 services:
   stats-server:
+    build: ./stat-server/server
+    image: stat_server_image
+    container_name: stat_server_container
+    depends_on:
+      stats-db:
+        condition: service_healthy
     ports:
       - "9090:9090"
 
+    environment:
+      - DB_NAME=stats-db
+      - DB_HOST=stats-db
+      - DB_PORT=5432
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+
   stats-db:
     image: postgres:16.1
-
-  ewm-service:
+    container_name: stats_db_container
     ports:
-      - "8080:8080"
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=stats-db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
 
-  ewm-db:
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - stats-data:/var/lib/postgresql/data
+
+  main-service:
+    build: ./main-service
+    image: main_service_image
+    container_name: main_service_container
+    depends_on:
+      main-service-db:
+        condition: service_healthy
+    ports:
+      - "8081:8081" #Перед пушем поправить порты
+    environment:
+      - DB_NAME=main-service-db
+      - DB_HOST=main-service-db
+      - DB_PORT=5432
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+
+
+  main-service-db:
     image: postgres:16.1
+    container_name: main_service_db_container
+    ports:
+      - "6542:5432"
+    environment:
+      - POSTGRES_DB=main-service-db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - main-service-data:/var/lib/postgresql/data
+
+volumes:
+  stats-data:
+  main-service-data:
