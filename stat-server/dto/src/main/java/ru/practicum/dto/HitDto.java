@@ -8,20 +8,19 @@ import java.time.LocalDateTime;
 
 @Builder
 @Getter
-@Setter
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class HitDto {
 
-    @NotBlank(message = "Not able to add hit if app is NULL/EMPTY")
+    @NotBlank(message = "Hit's app is NULL or EMPTY")
     private String app;
 
-    @NotBlank(message = "Not able to add hit if uri is NULL/EMPTY")
+    @NotBlank(message = "Hit's uri is NULL or EMPTY")
     private String uri;
 
-    @NotBlank(message = "Not able to add hit if ip is NULL/EMPTY")
+    @NotBlank(message = "Hit's ip is NULL or EMPTY")
     private String ip;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

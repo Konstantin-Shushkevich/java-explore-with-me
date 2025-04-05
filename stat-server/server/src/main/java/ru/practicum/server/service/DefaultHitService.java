@@ -15,7 +15,7 @@ import static ru.practicum.server.mapper.HitMapper.toHitDto;
 
 @Service
 @RequiredArgsConstructor
-public class HitServiceImpl implements HitService {
+public class DefaultHitService implements HitService {
 
     private final HitRepository hitRepository;
 
@@ -25,16 +25,22 @@ public class HitServiceImpl implements HitService {
     }
 
     @Override
-    public List<StatsDto> findStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+    public List<StatsDto> findStats(LocalDateTime start, LocalDateTime end, List<String> uris) {
+        validateTimeInterval(start, end);
+
+        return hitRepository.getStats(start, end, uris);
+    }
+
+    @Override
+    public List<StatsDto> findStatsIfUnique(LocalDateTime start, LocalDateTime end, List<String> uris) {
+        validateTimeInterval(start, end);
+
+        return hitRepository.getUniqueStats(start, end, uris);
+    }
+
+    private void validateTimeInterval(LocalDateTime start, LocalDateTime end) {
         if (start.isAfter(end)) {
             throw new DateTimeNotValidException("Start cannot be after end");
         }
-
-        if (unique) {
-            return hitRepository.getUniqueStats(start, end, uris);
-        } else {
-            return hitRepository.getStats(start, end, uris);
-        }
-
     }
 }

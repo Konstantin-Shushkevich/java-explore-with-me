@@ -35,6 +35,11 @@ public class HitController {
                                     @RequestParam(required = false) List<String> uris,
                                     @RequestParam(required = false, defaultValue = "false") boolean unique) {
         log.trace("Getting statistics s started (at server level of stats module)");
-        return hitService.findStats(start, end, uris, unique);
+
+        if (unique) {
+            return hitService.findStatsIfUnique(start, end, uris);
+        } else {
+            return hitService.findStats(start, end, uris);
+        }
     }
 }
