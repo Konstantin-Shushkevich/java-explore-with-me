@@ -42,7 +42,7 @@ services:
       main-service-db:
         condition: service_healthy
     ports:
-      - "8081:8081" #Перед пушем поправить порты
+      - "8080:8080"
     environment:
       - DB_NAME=main-service-db
       - DB_HOST=main-service-db
