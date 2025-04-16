@@ -90,12 +90,15 @@ public class EventServicePrivateDefault implements EventServicePrivate {
         if (eventFromBd.getState().equals(EventState.PUBLISHED)) {
             throw new ViolationOfTermsException("Only PENDING or CANCELED events can be changed");
         }
+
         Category category = eventFromBd.getCategory();
+
         if (!Objects.isNull(updateEventUserRequest.getCategory())) {
             category = categoryRepository.findById(updateEventUserRequest.getCategory())
                     .orElseThrow(() -> new CategoryIsNotInRepositoryException("Category with id: "
                             + updateEventUserRequest.getCategory() + " was not found"));
         }
+
         Location location = Objects.isNull(updateEventUserRequest.getLocation()) ?
                 eventFromBd.getLocation() : updateEventUserRequest.getLocation();
         Event newEvent = EventMapper.toEvent(updateEventUserRequest, eventFromBd, category, location);

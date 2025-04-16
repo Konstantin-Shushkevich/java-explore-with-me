@@ -2,14 +2,18 @@ package ru.practicum.service.compilation.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.UniqueElements;
 
 import java.util.Set;
 
 @Builder
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UpdateCompilationRequest {
     @UniqueElements
     private Set<Long> events;

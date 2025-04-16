@@ -2,14 +2,12 @@ package ru.practicum.service.category.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Builder
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @RequiredArgsConstructor
 public class NewCategoryDto {
 
