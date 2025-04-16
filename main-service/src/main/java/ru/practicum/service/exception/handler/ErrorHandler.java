@@ -1,7 +1,9 @@
 package ru.practicum.service.exception.handler;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,9 +28,11 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({IncorrectRequestException.class,
+            MethodArgumentNotValidException.class,
+            ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleIncorrectRequestException(IncorrectRequestException e) {
+    public ApiError handleIncorrectRequestException(final RuntimeException e) {
         log.error("IncorrectRequestException was thrown");
         return ApiError.builder()
                 .status(HttpStatus.BAD_REQUEST.toString())
@@ -39,13 +43,13 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({CategoryHasRelatedEventsException.class, CategoryNameNotUniqueException.class,
-            ViolationOfTermsException.class})
+            ViolationOfTermsException.class, UserEmailAlreadyInRepositoryException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleConflictException(final RuntimeException e) {
         log.error("One of ConflictExceptions was thrown");
         return ApiError.builder()
                 .status(HttpStatus.CONFLICT.toString())
-                .reason("For the requested operation the conditions are not met.")
+                .reason("Something wrong with your data.")
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
                 .build();

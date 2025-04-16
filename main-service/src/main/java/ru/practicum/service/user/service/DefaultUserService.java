@@ -1,11 +1,13 @@
 package ru.practicum.service.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.service.exception.UserEmailAlreadyInRepositoryException;
 import ru.practicum.service.exception.UserIsNotInRepositoryException;
 import ru.practicum.service.user.dto.NewUserRequest;
 import ru.practicum.service.user.dto.UserDto;
@@ -27,7 +29,11 @@ public class DefaultUserService implements UserService {
 
     @Override
     public UserDto add(NewUserRequest newUserRequest) {
-        return toUserDto(userRepository.save(toUser(newUserRequest)));
+        try {
+            return toUserDto(userRepository.save(toUser(newUserRequest)));
+        } catch (DataIntegrityViolationException e) {
+            throw new UserEmailAlreadyInRepositoryException("Trying to save email that has already been in repository");
+        }
     }
 
     @Override

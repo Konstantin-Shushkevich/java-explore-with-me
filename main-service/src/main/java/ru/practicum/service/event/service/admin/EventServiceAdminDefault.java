@@ -57,24 +57,29 @@ public class EventServiceAdminDefault implements EventServiceAdmin {
     public EventFullDto updateById(Long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
         Event eventFromBd = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventIsNotInRepositoryException("Event with id: " + eventId + " was not found"));
+
         if (!Objects.isNull(updateEventAdminRequest.getStateAction())
                 && !eventFromBd.getState().equals(EventState.PENDING)) {
             throw new ViolationOfTermsException("Event with id: " + eventId + " does not have the PENDING status");
         }
+
         Category category = eventFromBd.getCategory();
         if (!Objects.isNull(updateEventAdminRequest.getCategory())) {
             category = categoryRepository.findById(updateEventAdminRequest.getCategory())
                     .orElseThrow(() -> new CategoryIsNotInRepositoryException("Category with id: "
                             + updateEventAdminRequest.getCategory() + " was not found"));
         }
+
         Location location = Objects.isNull(updateEventAdminRequest.getLocation()) ?
                 eventFromBd.getLocation() : updateEventAdminRequest.getLocation();
         Event newEvent = EventMapper.toEvent(updateEventAdminRequest, eventFromBd, category, location);
+
         if (!Objects.isNull(newEvent.getPublishedOn())
                 && newEvent.getEventDate().isBefore(newEvent.getPublishedOn().plusHours(1))) {
             throw new ViolationOfTermsException("The date of the event must be no earlier than one hour " +
                     "from the date of publication");
         }
+
         return EventMapper.toEventFullDto(eventRepository
                 .save(newEvent), getConfirmedRequests(newEvent), getViews(newEvent));
     }
