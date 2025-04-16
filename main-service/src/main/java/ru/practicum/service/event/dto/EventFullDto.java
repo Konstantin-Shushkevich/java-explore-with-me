@@ -2,6 +2,7 @@ package ru.practicum.service.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
+import lombok.Data;
 import ru.practicum.service.category.dto.CategoryDto;
 import ru.practicum.service.event.model.EventState;
 import ru.practicum.service.event.model.Location;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 
 import static ru.practicum.service.util.Constant.DATE_TIME_FORMATTER;
 
+@Data
 @Builder
 public class EventFullDto {
     private Long id;

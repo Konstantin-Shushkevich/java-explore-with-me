@@ -36,7 +36,7 @@ public class EventPrivateController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventFullDto add(@Positive @PathVariable Long userId,
+    public EventFullDto add(@Positive @PathVariable Long userId, // имя явно указать?
                             @Valid @RequestBody NewEventDto newEventDto) {
         log.trace("Adding event by user with: {} is started at controller-level", userId);
         return eventService.add(userId, newEventDto);

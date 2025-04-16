@@ -7,11 +7,8 @@ import ru.practicum.service.user.model.User;
 
 import java.time.LocalDateTime;
 
+@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@EqualsAndHashCode
 @Entity
 @Table(name = "events", schema = "public")
 public class Event {

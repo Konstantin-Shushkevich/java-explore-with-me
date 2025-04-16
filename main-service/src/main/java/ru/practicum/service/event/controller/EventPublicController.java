@@ -47,7 +47,7 @@ public class EventPublicController {
     }
 
     @GetMapping("/{id}")
-    public EventFullDto findById(@Positive @PathVariable Long id, HttpServletRequest request) {
+    public EventFullDto findById(@PositiveOrZero @PathVariable Long id, HttpServletRequest request) {
         log.trace("Getting of event with id: {} is started at controller-level (public)", id);
         return eventServicePublic.findById(id, request);
     }

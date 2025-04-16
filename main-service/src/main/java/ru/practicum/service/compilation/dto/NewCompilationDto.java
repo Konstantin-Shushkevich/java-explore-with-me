@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class NewCompilationDto {
 
-    @UniqueElements(message = "List of events has no unique elements")
+    @UniqueElements(message = "List of events has not unique elements")
     private Set<Long> events;
 
     private Boolean pinned;
