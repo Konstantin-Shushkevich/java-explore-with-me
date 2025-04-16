@@ -32,14 +32,21 @@ public class CompilationServiceAdminDefault implements CompilationServiceAdmin {
     @Override
     public CompilationDto add(NewCompilationDto newCompilationDto) {
         Set<Event> events = new HashSet<>();
+
         if (!Objects.isNull(newCompilationDto.getEvents()) && !newCompilationDto.getEvents().isEmpty()) {
             events = eventRepository.findByIdIn(newCompilationDto.getEvents());
             int countOfSkipped = newCompilationDto.getEvents().size() - events.size();
+
             if (countOfSkipped != 0) {
                 throw new EventIsNotInRepositoryException("From the provided list of events " + countOfSkipped
                         + "events are not found");
             }
         }
+
+        if (newCompilationDto.getPinned() == null) {
+            newCompilationDto.setPinned(false);
+        }
+
         return toCompilationDto(compilationRepository.save(
                 toCompilation(newCompilationDto, events)), eventService.toEventShortDtoList(events));
     }

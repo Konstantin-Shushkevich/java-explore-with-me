@@ -37,7 +37,7 @@ public class EventAdminController {
             @DateTimeFormat(pattern = DATE_TIME_FORMATTER)
             @RequestParam(required = false) LocalDateTime rangeEnd,
             @PositiveOrZero @RequestParam(defaultValue = "0") int from,
-            @Positive @RequestParam(defaultValue = "10") int size) {
+            @PositiveOrZero @RequestParam(defaultValue = "10") int size) {
         log.trace("Getting List of EventFullDto by criteria is started at controller-level");
         return eventServiceAdmin.findAllByCriteria(users, states, categories, rangeStart, rangeEnd, from, size);
     }

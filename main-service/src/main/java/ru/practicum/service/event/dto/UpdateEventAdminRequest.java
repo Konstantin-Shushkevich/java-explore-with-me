@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ru.practicum.service.event.dto.action.AdminStateAction;
 import ru.practicum.service.event.model.Location;
+import ru.practicum.service.util.validation.NotEarlierThanTwoHours;
 
 import java.time.LocalDateTime;
 
@@ -32,6 +33,7 @@ public class UpdateEventAdminRequest {
     @Size(min = 20, max = 7000)
     private String description;
 
+    @NotEarlierThanTwoHours
     @JsonFormat(pattern = DATE_TIME_FORMATTER, shape = JsonFormat.Shape.STRING)
     private LocalDateTime eventDate;
 

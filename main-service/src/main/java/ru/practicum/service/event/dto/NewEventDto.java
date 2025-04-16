@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ru.practicum.service.event.model.Location;
+import ru.practicum.service.util.validation.NotEarlierThanTwoHours;
 
 import java.time.LocalDateTime;
 
@@ -31,6 +32,7 @@ public class NewEventDto {
     private String description;
 
     @NotNull
+    @NotEarlierThanTwoHours
     @JsonFormat(pattern = DATE_TIME_FORMATTER)
     private LocalDateTime eventDate;
 
