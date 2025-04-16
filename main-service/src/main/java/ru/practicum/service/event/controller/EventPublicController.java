@@ -38,8 +38,8 @@ public class EventPublicController {
             @DateTimeFormat(pattern = DATE_TIME_FORMATTER) LocalDateTime rangeEnd,
             @RequestParam(required = false, defaultValue = "false") Boolean onlyAvailable,
             @RequestParam(required = false) @Pattern(regexp = "EVENT_DATE|VIEWS") String sort,
-            @PositiveOrZero @RequestParam(required = false, defaultValue = "0") int from,
-            @Positive @RequestParam(required = false, defaultValue = "10") int size,
+            @PositiveOrZero @RequestParam(defaultValue = "0") int from,
+            @Positive @RequestParam(defaultValue = "10") int size,
             HttpServletRequest request) {
         log.trace("Getting List of EventShortDto is started at controller-level (public)");
         return eventServicePublic.findByFilters(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort,

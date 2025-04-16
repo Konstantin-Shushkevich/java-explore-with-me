@@ -24,7 +24,7 @@ public class RestStatClient implements StatClient {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
-    public RestStatClient(@Value("${stats-server.url}") String serverUrl) {
+    public RestStatClient(@Value("${client.url}") String serverUrl) {
         this.restClient = RestClient.builder()
                 .baseUrl(serverUrl)
                 .defaultHeaders(headers -> {

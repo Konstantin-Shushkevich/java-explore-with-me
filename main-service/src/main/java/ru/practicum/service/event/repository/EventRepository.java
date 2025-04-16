@@ -36,20 +36,25 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("select e " +
             "from Event as e " +
-            "where (:text is null or ((lower(e.description) like lower(concat('%', :text, '%'))) or " +
-            "(lower(e.annotation) like lower(concat('%', :text, '%'))))) " +
+            "where (:text is null or " +
+            "(lower(e.description) like lower(concat('%', cast(:text as string), '%')) or " +
+            "(lower(e.annotation) like lower(concat('%', cast(:text as string), '%'))))) " +
             "and (:categories is null or e.category.id in :categories) " +
             "and (:paid is null or e.paid = :paid) " +
             "and (e.eventDate >= :rangeStart) " +
-            "and (cast(:rangeEnd as timestamp ) is null or e.eventDate <= :rangeEnd) " +
+            "and (cast(:rangeEnd as timestamp) is null or e.eventDate <= :rangeEnd) " +
             "and (:onlyAvailable = false or " +
             "(:onlyAvailable = true and " +
             "(e.participantLimit = 0 or " +
             "(e.participantLimit - (select count(r) from ParticipationRequest as r where r.event.id = e.id " +
             "and r.status = 'CONFIRMED') > 0)))) " +
             "and e.state = 'PUBLISHED'")
-    Page<Event> getEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
-                          LocalDateTime rangeEnd, Boolean onlyAvailable, Pageable pageable);
+    Page<Event> getEvents(@Param("text") String text,
+                          @Param("categories") List<Long> categories,
+                          @Param("paid") Boolean paid,
+                          @Param("rangeStart") LocalDateTime rangeStart,
+                          @Param("rangeEnd") LocalDateTime rangeEnd,
+                          @Param("onlyAvailable") Boolean onlyAvailable, Pageable pageable);
 
     Set<Event> findByIdIn(Set<Long> events);
 }

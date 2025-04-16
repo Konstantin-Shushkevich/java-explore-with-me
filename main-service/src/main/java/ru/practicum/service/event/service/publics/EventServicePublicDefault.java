@@ -60,24 +60,21 @@ public class EventServicePublicDefault implements EventServicePublic {
             return Collections.emptyList();
         }
         saveHit(request);
-        switch (Objects.isNull(sort) ? "default" : sort) {
-            case "EVENT_DATE":
-                return eventRepository.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
-                                getPageable(from, size, Sort.by("eventDate"))).stream()
-                        .map(event -> toEventShortDto(event, getConfirmedRequests(event), getViews(event)))
-                        .collect(Collectors.toList());
-            case "VIEWS":
-                return eventRepository.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
-                                getPageable(from, size, null)).stream()
-                        .map(event -> toEventShortDto(event, getConfirmedRequests(event), getViews(event)))
-                        .sorted(Comparator.comparing(EventShortDto::getViews).reversed())
-                        .collect(Collectors.toList());
-            default:
-                return eventRepository.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
-                                getPageable(from, size, null)).stream()
-                        .map(event -> toEventShortDto(event, getConfirmedRequests(event), getViews(event)))
-                        .collect(Collectors.toList());
-        }
+        return switch (Objects.isNull(sort) ? "default" : sort) {
+            case "EVENT_DATE" -> eventRepository.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
+                            getPageable(from, size, Sort.by("eventDate"))).stream()
+                    .map(event -> toEventShortDto(event, getConfirmedRequests(event), getViews(event)))
+                    .collect(Collectors.toList());
+            case "VIEWS" -> eventRepository.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
+                            getPageable(from, size, null)).stream()
+                    .map(event -> toEventShortDto(event, getConfirmedRequests(event), getViews(event)))
+                    .sorted(Comparator.comparing(EventShortDto::getViews).reversed())
+                    .collect(Collectors.toList());
+            default -> eventRepository.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
+                            getPageable(from, size, null)).stream()
+                    .map(event -> toEventShortDto(event, getConfirmedRequests(event), getViews(event)))
+                    .collect(Collectors.toList());
+        };
     }
 
     @Override
@@ -120,7 +117,7 @@ public class EventServicePublicDefault implements EventServicePublic {
     private void saveHit(HttpServletRequest request) {
         ResponseEntity<Object> response = statClient.addHit(
                 HitDto.builder()
-                        .app("ewm-main-service")
+                        .app("main-service")
                         .uri(request.getRequestURI())
                         .ip(request.getRemoteAddr())
                         .timestamp(LocalDateTime.now())
