@@ -8,7 +8,6 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class NewCategoryDto {
 
     @NotBlank(message = "Category name is NULL or EMPTY")
