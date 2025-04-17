@@ -14,6 +14,7 @@ import ru.practicum.dto.StatsDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -23,7 +24,7 @@ public class RestStatClient implements StatClient {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
-    public RestStatClient(@Value("${stats-server.url}") String serverUrl) {
+    public RestStatClient(@Value("${client.url}") String serverUrl) {
         this.restClient = RestClient.builder()
                 .baseUrl(serverUrl)
                 .defaultHeaders(headers -> {
@@ -55,7 +56,7 @@ public class RestStatClient implements StatClient {
     }
 
     @Override
-    public ResponseEntity<Object> readStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+    public List<StatsDto> readStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         try {
             ResponseEntity<List<StatsDto>> response = restClient.get()
                     .uri(uriBuilder -> uriBuilder
@@ -66,17 +67,12 @@ public class RestStatClient implements StatClient {
                             .queryParam("unique", unique)
                             .build())
                     .retrieve()
-                    .toEntity(new ParameterizedTypeReference<>() {
-                    });
+                    .toEntity(new ParameterizedTypeReference<List<StatsDto>>() {});
 
-            return ResponseEntity.status(response.getStatusCode())
-                    .headers(response.getHeaders())
-                    .body(response.getBody());
+            return response.getBody() != null ? response.getBody() : Collections.emptyList();
 
         } catch (RestClientResponseException e) {
-            return ResponseEntity.status(e.getStatusCode())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(e.getResponseBodyAsString());
+            return Collections.emptyList();
         }
     }
 }
