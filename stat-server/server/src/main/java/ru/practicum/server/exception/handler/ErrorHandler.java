@@ -2,6 +2,7 @@ package ru.practicum.server.exception.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -11,11 +12,11 @@ import ru.practicum.server.exception.DateTimeNotValidException;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler({DateTimeNotValidException.class, MissingServletRequestParameterException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleDateTimeNotValidException(final DateTimeNotValidException e) {
-        log.error("DateTimeNotValidException was thrown");
-        return new ErrorResponse("Incorrect time of start or end", e.getMessage());
+    public ErrorResponse handleIncorrectRequestException(final RuntimeException e) {
+        log.error("Incorrectly made request.");
+        return new ErrorResponse("Incorrect request", e.getMessage());
     }
 
     @ExceptionHandler
