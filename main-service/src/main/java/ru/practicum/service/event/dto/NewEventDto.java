@@ -2,10 +2,7 @@ package ru.practicum.service.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.service.event.model.Location;
 import ru.practicum.service.util.validation.NotEarlierThanTwoHours;
 
@@ -15,6 +12,7 @@ import static ru.practicum.service.util.Constant.DATE_TIME_FORMATTER;
 
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class NewEventDto {

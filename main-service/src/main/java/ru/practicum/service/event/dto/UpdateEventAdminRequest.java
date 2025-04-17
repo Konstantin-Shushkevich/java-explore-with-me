@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.service.event.dto.action.AdminStateAction;
 import ru.practicum.service.event.model.Location;
 import ru.practicum.service.util.validation.NotEarlierThanTwoHours;
@@ -17,9 +14,10 @@ import java.time.LocalDateTime;
 import static ru.practicum.service.util.Constant.DATE_TIME_FORMATTER;
 
 @Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 public class UpdateEventAdminRequest {
 
     @NotBlank
