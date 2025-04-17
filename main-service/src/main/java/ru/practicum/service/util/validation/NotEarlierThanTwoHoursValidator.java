@@ -17,6 +17,11 @@ public class NotEarlierThanTwoHoursValidator implements
 
     @Override
     public boolean isValid(LocalDateTime value, ConstraintValidatorContext context) {
+
+        if (value == null) {
+            return true;
+        }
+
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime minAllowedTime = now.plusHours(hoursOffset);
 
