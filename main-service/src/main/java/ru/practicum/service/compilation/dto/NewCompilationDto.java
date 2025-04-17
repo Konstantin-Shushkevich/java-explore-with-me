@@ -3,7 +3,6 @@ package ru.practicum.service.compilation.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import java.util.Set;
 
@@ -14,7 +13,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class NewCompilationDto {
 
-    @UniqueElements(message = "List of events has not unique elements")
     private Set<Long> events;
 
     private Boolean pinned;

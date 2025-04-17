@@ -12,11 +12,7 @@ import java.time.LocalDateTime;
 
 import static ru.practicum.service.util.Constant.DATE_TIME_FORMATTER;
 
-@Builder
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class UpdateEventUserRequest {
 
     @Size(min = 20, max = 2000)

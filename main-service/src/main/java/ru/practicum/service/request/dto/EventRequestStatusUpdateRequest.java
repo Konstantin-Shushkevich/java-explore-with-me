@@ -9,11 +9,7 @@ import ru.practicum.service.request.model.ParticipationRequestStatus;
 
 import java.util.List;
 
-@Builder
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class EventRequestStatusUpdateRequest {
 
     @NotEmpty
