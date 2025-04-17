@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import ru.practicum.service.event.dto.action.UserStateAction;
 import ru.practicum.service.event.model.Location;
+import ru.practicum.service.util.validation.NotEarlierThanTwoHours;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +26,7 @@ public class UpdateEventUserRequest {
     private String description;
 
     @JsonFormat(pattern = DATE_TIME_FORMATTER)
+    @NotEarlierThanTwoHours
     private LocalDateTime eventDate;
 
     private Location location;

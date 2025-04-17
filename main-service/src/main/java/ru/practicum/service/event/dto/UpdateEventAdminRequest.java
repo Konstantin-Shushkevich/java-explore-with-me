@@ -28,7 +28,6 @@ public class UpdateEventAdminRequest {
     @Size(min = 20, max = 7000)
     private String description;
 
-    //@NotEarlierThanTwoHours
     @Future
     @JsonFormat(pattern = DATE_TIME_FORMATTER, shape = JsonFormat.Shape.STRING)
     private LocalDateTime eventDate;
