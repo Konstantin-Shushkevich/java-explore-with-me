@@ -7,11 +7,12 @@ import ru.practicum.service.event.dto.UpdateEventUserRequest;
 import ru.practicum.service.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.service.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.service.request.dto.ParticipationRequestDto;
+import ru.practicum.service.util.pageable.PageRequestParams;
 
 import java.util.List;
 
 public interface EventServicePrivate {
-    List<EventShortDto> getByAuthor(Long userId, Integer from, Integer size);
+    List<EventShortDto> getByAuthor(Long userId, PageRequestParams pageRequestParams);
 
     EventFullDto add(Long userId, NewEventDto newEventDto);
 

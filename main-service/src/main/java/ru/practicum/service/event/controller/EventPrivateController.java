@@ -2,7 +2,6 @@ package ru.practicum.service.event.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,7 @@ import ru.practicum.service.event.service.nonpublic.EventServicePrivate;
 import ru.practicum.service.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.service.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.service.request.dto.ParticipationRequestDto;
+import ru.practicum.service.util.pageable.PageRequestParams;
 
 import java.util.List;
 
@@ -28,15 +28,14 @@ public class EventPrivateController {
     @GetMapping
     public List<EventShortDto> getByAuthor(
             @Positive @PathVariable Long userId,
-            @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
-            @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+            @Valid @ModelAttribute PageRequestParams pageRequestParams) {
         log.trace("Getting List of EventShortDto by author is started at controller-level");
-        return eventService.getByAuthor(userId, from, size);
+        return eventService.getByAuthor(userId, pageRequestParams);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EventFullDto add(@Positive @PathVariable Long userId, // имя явно указать?
+    public EventFullDto add(@Positive @PathVariable Long userId,
                             @Valid @RequestBody NewEventDto newEventDto) {
         log.trace("Adding event by user with: {} is started at controller-level", userId);
         return eventService.add(userId, newEventDto);

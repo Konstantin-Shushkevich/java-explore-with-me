@@ -1,59 +1,62 @@
 package ru.practicum.service.event.service.admin;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.client.StatClient;
-import ru.practicum.dto.StatsDto;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.service.category.model.Category;
 import ru.practicum.service.category.repository.CategoryRepository;
 import ru.practicum.service.event.dto.EventFullDto;
 import ru.practicum.service.event.dto.EventShortDto;
 import ru.practicum.service.event.dto.UpdateEventAdminRequest;
 import ru.practicum.service.event.dto.mapper.EventMapper;
+import ru.practicum.service.event.dto.params.EventAdminFilterParams;
 import ru.practicum.service.event.model.Event;
 import ru.practicum.service.event.model.EventState;
 import ru.practicum.service.event.model.Location;
 import ru.practicum.service.event.repository.EventRepository;
+import ru.practicum.service.event.service.EventStatisticsService;
 import ru.practicum.service.exception.CategoryIsNotInRepositoryException;
 import ru.practicum.service.exception.EventIsNotInRepositoryException;
-import ru.practicum.service.exception.StatisticServerException;
 import ru.practicum.service.exception.ViolationOfTermsException;
-import ru.practicum.service.request.model.ParticipationRequestStatus;
-import ru.practicum.service.request.repository.ParticipationRequestRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ru.practicum.service.util.pageable.PageableUtils.getPageable;
+
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class EventServiceAdminDefault implements EventServiceAdmin {
 
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
-    private final ParticipationRequestRepository participationRequestRepository;
-    private final StatClient statClient;
+    private final EventStatisticsService eventStatisticsService;
 
     @Override
-    public List<EventFullDto> findAllByCriteria(List<Long> users,
-                                                List<EventState> states,
-                                                List<Long> categories,
-                                                LocalDateTime rangeStart,
-                                                LocalDateTime rangeEnd,
-                                                int from,
-                                                int size) {
-        return eventRepository.getEventsForAdmin(users, states, categories, rangeStart, rangeEnd,
-                        getPageable(from, size, Sort.by("id").ascending()))
-                .stream().map(event -> EventMapper.toEventFullDto(event, getConfirmedRequests(event), getViews(event)))
+    public List<EventFullDto> findAllByCriteria(EventAdminFilterParams eventAdminFilterParams) {
+
+        Page<Event> events = eventRepository.getEventsForAdmin(eventAdminFilterParams.getUsers(),
+                eventAdminFilterParams.getStates(),
+                eventAdminFilterParams.getCategories(),
+                eventAdminFilterParams.getRangeStart(),
+                eventAdminFilterParams.getRangeEnd(),
+                getPageable(
+                        eventAdminFilterParams.getFrom(), eventAdminFilterParams.getSize(),
+                        Sort.by("id").ascending()));
+
+        return events.stream()
+                .map(event -> EventMapper.toEventFullDto(event, eventStatisticsService.getConfirmedRequests(event),
+                        eventStatisticsService.getViews(event)))
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional
     public EventFullDto updateById(Long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
         Event eventFromBd = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventIsNotInRepositoryException("Event with id: " + eventId + " was not found"));
@@ -80,40 +83,15 @@ public class EventServiceAdminDefault implements EventServiceAdmin {
                     "from the date of publication");
         }
 
-        return EventMapper.toEventFullDto(eventRepository
-                .save(newEvent), getConfirmedRequests(newEvent), getViews(newEvent));
-    }
-
-    private Pageable getPageable(int from, int size, Sort sort) {
-        int page = from / size;
-        return Objects.isNull(sort) ? PageRequest.of(page, size) : PageRequest.of(page, size, sort);
-    }
-
-    private Integer getConfirmedRequests(Event event) {
-        return event.getState().equals(EventState.PUBLISHED) ?
-                participationRequestRepository.countAllByEventIdAndStatus(event.getId(), ParticipationRequestStatus.CONFIRMED) : 0;
-    }
-
-    private Long getViews(Event event) {
-        if (!event.getState().equals(EventState.PUBLISHED)) {
-            return 0L;
-        }
-        List<StatsDto> statsDto;
-        try {
-            statsDto = statClient.readStats(
-                    event.getPublishedOn(),
-                    LocalDateTime.now(),
-                    List.of(String.format("/events/%d", event.getId())),
-                    true
-            );
-        } catch (Throwable e) {
-            throw new StatisticServerException("Error at the statistics-client");
-        }
-        return statsDto.isEmpty() ? 0L : statsDto.getFirst().getHits();
+        return EventMapper.toEventFullDto(
+                eventRepository.save(newEvent), eventStatisticsService.getConfirmedRequests(newEvent),
+                eventStatisticsService.getViews(newEvent));
     }
 
     public Set<EventShortDto> toEventShortDtoList(Set<Event> events) {
-        return events.stream().map(event -> EventMapper.toEventShortDto(event, getConfirmedRequests(event),
-                getViews(event))).collect(Collectors.toSet());
+        return events.stream().map(event -> EventMapper.toEventShortDto(
+                event,
+                eventStatisticsService.getConfirmedRequests(event),
+                eventStatisticsService.getViews(event))).collect(Collectors.toSet());
     }
 }

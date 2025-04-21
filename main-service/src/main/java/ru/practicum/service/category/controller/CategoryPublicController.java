@@ -1,13 +1,14 @@
 package ru.practicum.service.category.controller;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.category.dto.CategoryDto;
 import ru.practicum.service.category.service.publics.CategoryServicePublic;
+import ru.practicum.service.util.pageable.PageRequestParams;
 
 import java.util.List;
 
@@ -21,11 +22,10 @@ public class CategoryPublicController {
     private final CategoryServicePublic categoryService;
 
     @GetMapping
-    List<CategoryDto> findByCondition(@PositiveOrZero @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                      @Positive @RequestParam(value = "size", defaultValue = "10") Integer size) {
+    List<CategoryDto> findByCondition(@Valid @ModelAttribute PageRequestParams pageRequestParams) {
         log.trace("Getting List of categories selected by condition (from: {}, size: {}) is started at controller-level",
-                from, size);
-        return categoryService.findByCondition(from, size);
+                pageRequestParams.getFrom(), pageRequestParams.getSize());
+        return categoryService.findByCondition(pageRequestParams);
     }
 
     @GetMapping("/{catId}")

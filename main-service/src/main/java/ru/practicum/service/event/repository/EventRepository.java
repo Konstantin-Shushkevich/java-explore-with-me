@@ -20,7 +20,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Optional<Event> findByIdAndInitiatorId(Long id, Long initiatorId);
 
-    boolean existsByIdAndInitiatorId(Long id, Long initiatorId);
+    boolean existsByCategoryId(Long catId);
 
     Optional<Event> findByIdAndState(Long id, EventState state);
 

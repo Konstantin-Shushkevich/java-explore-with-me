@@ -2,6 +2,7 @@ package ru.practicum.service.compilation.service.admin;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.service.compilation.dto.CompilationDto;
 import ru.practicum.service.compilation.dto.NewCompilationDto;
 import ru.practicum.service.compilation.dto.UpdateCompilationRequest;
@@ -22,6 +23,7 @@ import static ru.practicum.service.compilation.dto.mapper.CompilationMapper.toCo
 import static ru.practicum.service.compilation.dto.mapper.CompilationMapper.toCompilationDto;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CompilationServiceAdminDefault implements CompilationServiceAdmin {
 
@@ -47,39 +49,53 @@ public class CompilationServiceAdminDefault implements CompilationServiceAdmin {
             newCompilationDto.setPinned(false);
         }
 
-        return toCompilationDto(compilationRepository.save(
-                toCompilation(newCompilationDto, events)), eventService.toEventShortDtoList(events));
+        Compilation compilationForSave = toCompilation(newCompilationDto, events);
+
+        return saveAndReturnCompilationDto(compilationForSave, events);
     }
 
     @Override
     public void deleteById(Long compId) {
-        if (!compilationRepository.existsById(compId)) {
-            throw new CompilationIsNotInRepositoryException("Compilation with id: " + compId + " was not found");
-        }
+        findCompilationByIdIfExists(compId);
+
         compilationRepository.deleteById(compId);
     }
 
     @Override
     public CompilationDto updateById(Long compId, UpdateCompilationRequest updateCompilationRequest) {
-        Compilation compilationFromBd = compilationRepository.findById(compId)
-                .orElseThrow(() -> new CompilationIsNotInRepositoryException("Compilation with id: " + compId +
-                        " was not found"));
+        Compilation compilationFromRep = findCompilationByIdIfExists(compId);
+
         Set<Event> events;
+
         if (Objects.isNull(updateCompilationRequest.getEvents())) {
-            events = compilationFromBd.getEvents();
+            events = compilationFromRep.getEvents();
         } else if (!updateCompilationRequest.getEvents().isEmpty()) {
             events = eventRepository.findByIdIn(updateCompilationRequest.getEvents());
             int countOfSkipped = updateCompilationRequest.getEvents().size() - events.size();
+
             if (countOfSkipped != 0) {
                 throw new EventIsNotInRepositoryException("From the provided list of events " + countOfSkipped
                         + "events are not found");
             }
+
         } else {
             events = Collections.emptySet();
         }
 
-        return toCompilationDto(compilationRepository.save(toCompilation(
-                updateCompilationRequest, compilationFromBd, events)), eventService.toEventShortDtoList(events));
+        Compilation compilationForSave = toCompilation(updateCompilationRequest, compilationFromRep, events);
+
+        return saveAndReturnCompilationDto(compilationForSave, events);
+    }
+
+    private Compilation findCompilationByIdIfExists(Long compId) {
+        return compilationRepository.findById(compId)
+                .orElseThrow(() -> new CompilationIsNotInRepositoryException("Compilation with id: " + compId +
+                        " was not found"));
+    }
+
+    private CompilationDto saveAndReturnCompilationDto(Compilation compilationForSave, Set<Event> events) {
+        return toCompilationDto(compilationRepository.save(compilationForSave),
+                eventService.toEventShortDtoList(events));
     }
 }
 

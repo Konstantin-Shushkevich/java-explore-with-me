@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.user.dto.NewUserRequest;
 import ru.practicum.service.user.dto.UserDto;
 import ru.practicum.service.user.service.UserService;
+import ru.practicum.service.util.pageable.PageRequestParams;
 
 import java.util.List;
 
@@ -32,10 +33,9 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAll(@RequestParam(required = false) List<Long> ids,
-                                @RequestParam(required = false, defaultValue = "0") Integer from,
-                                @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                @Valid @ModelAttribute PageRequestParams pageRequestParams) {
         log.trace("Getting List of all users is started at controller-level");
-        return userService.getAll(ids, from, size);
+        return userService.getAll(ids, pageRequestParams);
     }
 
     @DeleteMapping("/{userId}")

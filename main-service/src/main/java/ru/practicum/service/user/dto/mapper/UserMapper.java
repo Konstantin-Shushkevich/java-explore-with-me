@@ -1,12 +1,10 @@
 package ru.practicum.service.user.dto.mapper;
 
-import org.springframework.stereotype.Component;
 import ru.practicum.service.user.dto.NewUserRequest;
 import ru.practicum.service.user.dto.UserDto;
 import ru.practicum.service.user.dto.UserShortDto;
 import ru.practicum.service.user.model.User;
 
-@Component
 public class UserMapper {
     public static User toUser(NewUserRequest newUserRequest) {
         return User.builder()
