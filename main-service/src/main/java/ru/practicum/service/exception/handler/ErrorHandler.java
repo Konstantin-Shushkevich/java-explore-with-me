@@ -16,8 +16,12 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler({CategoryIsNotInRepositoryException.class, UserIsNotInRepositoryException.class,
-            EventIsNotInRepositoryException.class, RequestNotFoundException.class})
+    @ExceptionHandler({
+            CategoryIsNotInRepositoryException.class,
+            UserIsNotInRepositoryException.class,
+            EventIsNotInRepositoryException.class,
+            RequestNotFoundException.class,
+            CommentIsNotInRepositoryException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFoundException(final RuntimeException e) {
         log.error("One of NotFoundExceptions was thrown");
@@ -29,9 +33,12 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler({IncorrectRequestException.class,
+    @ExceptionHandler({
+            IncorrectRequestException.class,
             MethodArgumentNotValidException.class,
-            ConstraintViolationException.class, MissingServletRequestParameterException.class})
+            ConstraintViolationException.class,
+            MissingServletRequestParameterException.class,
+            InvalidCommentTimeFiltersRequest.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleIncorrectRequestException(final RuntimeException e) {
         log.error("IncorrectRequestException was thrown");
@@ -43,8 +50,11 @@ public class ErrorHandler {
                 .build();
     }
 
-    @ExceptionHandler({CategoryHasRelatedEventsException.class, CategoryNameNotUniqueException.class,
-            ViolationOfTermsException.class, UserEmailAlreadyInRepositoryException.class})
+    @ExceptionHandler({
+            CategoryHasRelatedEventsException.class,
+            CategoryNameNotUniqueException.class,
+            ViolationOfTermsException.class,
+            UserEmailAlreadyInRepositoryException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleConflictException(final RuntimeException e) {
         log.error("One of ConflictExceptions was thrown");
